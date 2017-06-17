@@ -42,25 +42,27 @@ c.execute("SELECT patient, survival FROM outcomes;")
 finalcompare = []
 finalpat = []
 
+#create patient and outcome data from SQL
 for i in range(c.rowcount):
 		a = list(c.fetchone())
 		finalcompare.append(int(a[1]))
 		finalpat.append(a[0])
 
-
+#usde for sorting data by correlation
 def abstu(x):
         return abs(x[5])
 
 
+#build 30 models
 for testval in range(30):
 
 	tuplesorter = []
 	findata = []
-
+	#training data
 	for i in range(len(finalouts)):
 		tuplesorter.append([])
 		for x in range(1, len(finalouts[i])):
-			if x == testval:
+			if x == testval: # exclude testing data
 				continue;
 			tuplesorter[i].append([float(finalouts[i][x]), finalcompare[x-1]])
 		tuplesorter[i].sort(key= lambda x:x[1])
@@ -93,7 +95,7 @@ for testval in range(30):
 
 
 	consensus = []
-
+	#apply model
 	for rankval in range(maxrankval):
 		#print rankval
 		inputstr = ("select * from final_microarray where name = '" + acfindata[rankval][0] + "';")
@@ -109,13 +111,13 @@ for testval in range(30):
 				normal = (x - acfindata[rankval][3]) / acfindata[rankval][4]
 				#print x, (acfindata[rankval][1]*normal+intercept)
 				consensus[l] += (acfindata[rankval][1]*normal+intercept)
-
+	#output results
 	for num, line in enumerate(consensus):
 
 		consensus[num] /= float(maxrankval)
 
 		if num == testval:
-			print finalpat[num], finalcompare[num], consensus[num], maxrankval
+			print finalpat[num], finalcompare[num], consensus[num], maxrankval #print prediction, along with other relevant data
 			out.write(finalpat[num] + '\n')
 			for i in range(maxrankval):
 				out.write(acfindata[i][0] + '\t' + str(acfindata[i][5]) + '\n')

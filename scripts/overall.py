@@ -2,6 +2,8 @@ import MySQLdb
 import numpy
 import scipy.stats as stats
 
+###note: many parts of this code are likely superfluous, artifacts of indiv.py
+
 db = MySQLdb.connect(host = "bm185s-mysql.ucsd.edu", user = "bm185saa", passwd = "Spi95kes", db = "bm185saa_db") ## REMEMBER TO REDACT PASSWORD
 c = db.cursor()
 
@@ -43,6 +45,7 @@ c.execute("SELECT patient, survival FROM outcomes;")
 finalcompare = []
 finalpat = []
 
+#get patient and outcome info
 for i in range(c.rowcount):
 		a = list(c.fetchone())
 		finalcompare.append(int(a[1]))
@@ -52,12 +55,12 @@ for i in range(c.rowcount):
 def abstu(x):
         return abs(x[5])
 
-
+#build one model
 for testval in range(1):
 
 	tuplesorter = []
 	findata = []
-
+	#collect and use data
 	for i in range(len(finalouts)):
 		tuplesorter.append([])
 		for x in range(1, len(finalouts[i])):
@@ -110,7 +113,7 @@ for testval in range(1):
 				normal = (x - acfindata[rankval][3]) / acfindata[rankval][4]
 				#print x, (acfindata[rankval][1]*normal+intercept)
 				consensus[l] += (acfindata[rankval][1]*normal+intercept)
-
+	#output results
 	for num, line in enumerate(consensus):
 
 		consensus[num] /= float(maxrankval)
